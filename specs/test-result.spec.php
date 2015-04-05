@@ -42,7 +42,7 @@ describe("TestResult", function() {
         });
 
         it('should increment the test count', function() {
-            $this->result->startTest();
+            $this->result->startTest(new Test('some test'));
             assert(1 === $this->result->getTestCount(), "test count should be 1");
         });
 
