@@ -13,12 +13,17 @@
         }
     ],
     "autoload": {
-      "psr-4": {
-        "Peridot\\Core\\": "src/"
-      }
+        "psr-4": {
+            "Peridot\\Core\\": "src/"
+         }
     },
     "require": {
         "peridot-php/peridot-scope": "~1.1",
         "evenement/evenement": "~2.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.0.x-dev"
+        }
     }
 }
