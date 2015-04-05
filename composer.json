@@ -1,0 +1,24 @@
+{
+    "name": "peridot-php/peridot-core",
+    "description": "Flexible test hierarchies",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Brian Scaturro",
+            "email": "scaturrob@gmail.com"
+        },
+        {
+            "name": "Austin Morris",
+            "email": "austin.morris@gmail.com"
+        }
+    ],
+    "autoload": {
+      "psr-4": {
+        "Peridot\\Core\\": "src/"
+      }
+    },
+    "require": {
+        "peridot-php/peridot-scope": "~1.1",
+        "evenement/evenement": "~2.0"
+    }
+}
