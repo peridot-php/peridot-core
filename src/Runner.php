@@ -21,7 +21,7 @@ class Runner implements RunnerInterface
      * @var bool
      */
     protected $stopOnFailure;
-    
+
     /**
      * @param Suite $suite
      * @param EventEmitterInterface $eventEmitter
@@ -57,10 +57,7 @@ class Runner implements RunnerInterface
     }
 
     /**
-     * Set whether or not the runner should stop on failure.
-     *
-     * @param bool $stop
-     * @return void
+     * {@inheritdoc}
      */
     public function setStopOnFailure($stop)
     {
@@ -68,9 +65,7 @@ class Runner implements RunnerInterface
     }
 
     /**
-     * Returns whether or not the Runner should stop on failure.
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function shouldStopOnFailure()
     {
