@@ -2,6 +2,7 @@
     "name": "peridot-php/peridot-core",
     "description": "Flexible test hierarchies",
     "license": "MIT",
+    "minimum-stability": "dev",
     "authors": [
         {
             "name": "Brian Scaturro",
@@ -20,6 +21,9 @@
     "require": {
         "peridot-php/peridot-scope": "~1.1",
         "evenement/evenement": "~2.0"
+    },
+    "require-dev": {
+        "peridot-php/peridot": "2.0.*@dev"
     },
     "extra": {
         "branch-alias": {

@@ -3,7 +3,7 @@ use Evenement\EventEmitter;
 use Peridot\Core\Test;
 use Peridot\Core\TestResult;
 use Peridot\Core\Suite;
-use Peridot\Core\Scope;
+use Peridot\Scope\Scope;
 
 describe("Suite", function() {
 

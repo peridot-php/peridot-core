@@ -12,11 +12,8 @@ matrix:
     - php: hhvm-nightly
     - php: 7
 
-before_script:
-  - wget http://peridot-php.github.io/downloads/peridot.phar
-
 install:
   - composer install --prefer-source
 
 script:
-  - php peridot.phar specs/
+  - vendor/bin/peridot
