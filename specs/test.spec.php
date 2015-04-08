@@ -4,7 +4,6 @@ use Peridot\Core\Test;
 use Peridot\Core\TestResult;
 use Peridot\Core\Suite;
 use Peridot\Core\Scope;
-use Peridot\Test\ItWasRun;
 
 describe("Test", function() {
 
@@ -17,40 +16,40 @@ describe("Test", function() {
 
     describe('->run()', function() {
         it("should run", function() {
-            $test = new ItWasRun("this should run", function() {
+            $test = new Test("this should run", function() {
                 $this->wasRun = true;
             });
             $test->run(new TestResult(new EventEmitter()));
-            assert($test->wasRun(), "spec should have run");
+            assert($test->getScope()->wasRun, "spec should have run");
         });
 
         it("should run setup functions", function() {
-            $test = new ItWasRun("this should setup", function() {});
+            $test = new Test("this should setup", function() {});
             $test->addSetupFunction(function() {
-                $this->log .= "setUp ";
+                $this->log = "setUp ";
             });
             $test->run(new TestResult(new EventEmitter()));
-            assert($test->log() == "setUp ", "spec should have been setup");
+            assert($test->getScope()->log == "setUp ", "spec should have been setup");
         });
 
         it("should run teardown functions", function() {
-            $test = new ItWasRun("this should teardown", function() {});
+            $test = new Test("this should teardown", function() {});
             $test->addTearDownFunction(function() {
-                $this->log .= "tearDown ";
+                $this->log = "tearDown ";
             });
             $test->run(new TestResult(new EventEmitter()));
-            assert($test->log() == "tearDown ", "spec should have been torn down");
+            assert($test->getScope()->log == "tearDown ", "spec should have been torn down");
         });
 
         it("should modify a passed in result", function () {
-            $test = new ItWasRun("this should return a result", function () {});
+            $test = new Test("this should return a result", function () {});
             $result = new TestResult(new EventEmitter());
             $test->run($result);
             assert("1 run, 0 failed" == $result->getSummary(), "result summary should have shown 1 run");
         });
 
         it("should add failed results to result", function () {
-            $test = new ItWasRun("this should return a failed result", function () {
+            $test = new Test("this should return a failed result", function () {
                 throw new \Exception('blaaargh');
             });
             $result = new TestResult(new EventEmitter());

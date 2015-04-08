@@ -4,7 +4,6 @@ use Peridot\Core\Test;
 use Peridot\Core\TestResult;
 use Peridot\Core\Suite;
 use Peridot\Core\Scope;
-use Peridot\Test\ItWasRun;
 
 describe("Suite", function() {
 
@@ -15,8 +14,8 @@ describe("Suite", function() {
     describe('->run()', function() {
         it("should run multiple tests", function () {
             $suite = new Suite("Suite", function() {});
-            $suite->addTest(new ItWasRun("should pass", function () {}));
-            $suite->addTest(new ItWasRun('should fail', function () {
+            $suite->addTest(new Test("should pass", function () {}));
+            $suite->addTest(new Test('should fail', function () {
                 throw new \Exception('woooooo!');
             }));
 
@@ -85,7 +84,7 @@ describe("Suite", function() {
             $suite->setPending(true);
             $fn = function() {};
 
-            $test1 = new ItWasRun("should have log", $fn);
+            $test1 = new Test("should have log", $fn);
             $suite->addTest($test1);
 
             $result = new TestResult($this->eventEmitter);

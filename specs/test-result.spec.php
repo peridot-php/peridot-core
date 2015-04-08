@@ -4,7 +4,6 @@ use Evenement\EventEmitter;
 use Peridot\Core\Test;
 use Peridot\Core\TestResult;
 use Peridot\Core\Suite;
-use Peridot\Test\ItWasRun;
 
 describe("TestResult", function() {
 
@@ -16,8 +15,8 @@ describe("TestResult", function() {
         $result = new TestResult($this->eventEmitter);
         $suite = new Suite("Suite", function() {});
         $suite->setEventEmitter($this->eventEmitter);
-        $suite->addTest(new ItWasRun("this was run", function () {}));
-        $suite->addTest(new ItWasRun("this was also run", function () {}));
+        $suite->addTest(new Test("this was run", function () {}));
+        $suite->addTest(new Test("this was also run", function () {}));
         $suite->run($result);
         assert($result->getTestCount() === 2, "two specs should have run");
     });
@@ -26,9 +25,9 @@ describe("TestResult", function() {
         $result = new TestResult($this->eventEmitter);
         $suite = new Suite("Suite", function() {});
         $suite->setEventEmitter($this->eventEmitter);
-        $suite->addTest(new ItWasRun("this was run", function () {}));
-        $suite->addTest(new ItWasRun("this was also run", function () {}));
-        $suite->addTest(new ItWasRun("this failed", function () {
+        $suite->addTest(new Test("this was run", function () {}));
+        $suite->addTest(new Test("this was also run", function () {}));
+        $suite->addTest(new Test("this failed", function () {
             throw new Exception('spec failed');
         }));
         $suite->run($result);
