@@ -63,6 +63,26 @@ class SuiteLoader implements SuiteLoaderInterface
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @param string $pattern
+     */
+    public function setPattern($pattern)
+    {
+        $this->pattern = $pattern;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getPattern()
+    {
+        return $this->pattern;
+    }
+
+    /**
      * Simple recursive glob
      *
      * @link http://php.net/manual/en/function.glob.php#106595

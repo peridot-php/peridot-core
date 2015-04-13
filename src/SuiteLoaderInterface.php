@@ -25,4 +25,18 @@ interface SuiteLoaderInterface
      * @param $path
      */
     public function load($path);
+
+    /**
+     * Set a pattern to act as a filter
+     *
+     * @param string $pattern
+     */
+    public function setPattern($pattern);
+
+    /**
+     * Get the pattern being used as a filter
+     *
+     * @return string
+     */
+    public function getPattern();
 }

@@ -66,4 +66,12 @@ describe("SuiteLoader", function() {
         });
     });
 
+    describe('pattern accessors', function () {
+        it('allows access to the loader pattern', function () {
+            $pattern = '*.test.php';
+            $this->loader->setPattern($pattern);
+            assert($this->loader->getPattern() === $pattern);
+        });
+    });
+
 });
