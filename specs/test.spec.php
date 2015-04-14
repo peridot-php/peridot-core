@@ -35,12 +35,12 @@ describe("Test", function() {
         it('should run setup callables that are not closures', function () {
             $test = new Test('setting up with non-closures', function () {});
             $stack = new SplStack();
-            $stack->add(1);
+            $stack->push(1);
 
             $test->addSetupFunction([$stack, 'pop']);
             $test->run(new TestResult(new EventEmitter()));
 
-            assert($stack->count() === 0);
+            assert($stack->isEmpty());
         });
 
         it("should run teardown functions", function() {
@@ -55,12 +55,12 @@ describe("Test", function() {
         it('should run teardown callables that are not closures', function () {
             $test = new Test('tearing down with non-closures', function () {});
             $stack = new SplStack();
-            $stack->add(1);
+            $stack->push(1);
 
             $test->addTearDownFunction([$stack, 'pop']);
             $test->run(new TestResult(new EventEmitter()));
 
-            assert($stack->count() === 0);
+            assert($stack->isEmpty());
         });
 
         it("should modify a passed in result", function () {
