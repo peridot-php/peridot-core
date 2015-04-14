@@ -69,7 +69,7 @@ class Test extends AbstractTest
         $this->forEachNodeTopDown(function (TestInterface $node) {
             $setups = $node->getSetupFunctions();
             foreach ($setups as $setup) {
-                $setup();
+                call_user_func($setup);
             }
         });
     }
@@ -87,7 +87,7 @@ class Test extends AbstractTest
             $tearDowns = $test->getTearDownFunctions();
             foreach ($tearDowns as $tearDown) {
                 try {
-                    $tearDown();
+                    call_user_func($tearDown);
                 } catch (Exception $e) {
                     $action = ['failTest', $this, $e];
                 }

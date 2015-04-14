@@ -32,6 +32,17 @@ describe("Test", function() {
             assert($test->getScope()->log == "setUp ", "spec should have been setup");
         });
 
+        it('should run setup callables that are not closures', function () {
+            $test = new Test('setting up with non-closures', function () {});
+            $stack = new SplStack();
+            $stack->add(1);
+
+            $test->addSetupFunction([$stack, 'pop']);
+            $test->run(new TestResult(new EventEmitter()));
+
+            assert($stack->count() === 0);
+        });
+
         it("should run teardown functions", function() {
             $test = new Test("this should teardown", function() {});
             $test->addTearDownFunction(function() {
@@ -39,6 +50,17 @@ describe("Test", function() {
             });
             $test->run(new TestResult(new EventEmitter()));
             assert($test->getScope()->log == "tearDown ", "spec should have been torn down");
+        });
+
+        it('should run teardown callables that are not closures', function () {
+            $test = new Test('tearing down with non-closures', function () {});
+            $stack = new SplStack();
+            $stack->add(1);
+
+            $test->addTearDownFunction([$stack, 'pop']);
+            $test->run(new TestResult(new EventEmitter()));
+
+            assert($stack->count() === 0);
         });
 
         it("should modify a passed in result", function () {
