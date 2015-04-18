@@ -20,7 +20,7 @@
     },
     "require": {
         "peridot-php/peridot-scope": "~1.1",
-        "evenement/evenement": "~2.0"
+        "peridot-php/event-emitter": "2.0.*@dev"
     },
     "require-dev": {
         "peridot-php/peridot": "2.0.*@dev"

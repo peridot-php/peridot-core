@@ -2,7 +2,7 @@
 
 namespace Peridot\Core;
 
-use Evenement\EventEmitterInterface;
+use Peridot\EventEmitterInterface;
 
 /**
  * TestResults tracks passing, pending, and failing tests.

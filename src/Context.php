@@ -1,7 +1,7 @@
 <?php
 namespace Peridot\Core;
 
-use Evenement\EventEmitter;
+use Peridot\EventEmitter;
 use Peridot\Core\HasEventEmitterTrait;
 use Peridot\Core\Test;
 use Peridot\Core\Suite;

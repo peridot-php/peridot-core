@@ -1,7 +1,7 @@
 <?php
 namespace Peridot\Core;
 
-use Evenement\EventEmitterInterface;
+use Peridot\EventEmitterInterface;
 
 /**
  * Trait indicating an object supports an EventEmitter via composition.
@@ -11,12 +11,12 @@ use Evenement\EventEmitterInterface;
 trait HasEventEmitterTrait
 {
     /**
-     * @var \Evenement\EventEmitterInterface
+     * @var \Peridot\EventEmitterInterface
      */
     protected $eventEmitter;
 
     /**
-     * @param \Evenement\EventEmitterInterface $eventEmitter
+     * @param \Peridot\EventEmitterInterface $eventEmitter
      */
     public function setEventEmitter(EventEmitterInterface $eventEmitter)
     {
@@ -26,7 +26,7 @@ trait HasEventEmitterTrait
     }
 
     /**
-     * @return \Evenement\EventEmitterInterface
+     * @return \Peridot\EventEmitterInterface
      */
     public function getEventEmitter()
     {

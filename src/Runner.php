@@ -1,7 +1,7 @@
 <?php
 namespace Peridot\Core;
 
-use Evenement\EventEmitterInterface;
+use Peridot\EventEmitterInterface;
 
 /**
  * The Runner is responsible for running a given Suite.
