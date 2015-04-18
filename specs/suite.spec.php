@@ -1,5 +1,5 @@
 <?php
-use Evenement\EventEmitter;
+use Peridot\EventEmitter;
 use Peridot\Core\Test;
 use Peridot\Core\TestResult;
 use Peridot\Core\Suite;

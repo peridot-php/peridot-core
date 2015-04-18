@@ -60,7 +60,7 @@ class Suite extends AbstractTest
      */
     public function define()
     {
-        $this->eventEmitter->emit('suite.define', [$this]);
+        $this->eventEmitter->emit('suite.define', $this);
         call_user_func_array($this->getDefinition(), $this->getDefinitionArguments());
     }
 
@@ -71,7 +71,7 @@ class Suite extends AbstractTest
      */
     public function run(TestResult $result)
     {
-        $this->eventEmitter->emit('suite.start', [$this]);
+        $this->eventEmitter->emit('suite.start', $this);
         $this->eventEmitter->on('suite.halt', [$this, 'halt']);
 
         foreach ($this->tests as $test) {
@@ -82,7 +82,7 @@ class Suite extends AbstractTest
 
             $this->runTest($test, $result);
         }
-        $this->eventEmitter->emit('suite.end', [$this]);
+        $this->eventEmitter->emit('suite.end', $this);
     }
 
     /**

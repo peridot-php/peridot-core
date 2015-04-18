@@ -1,5 +1,4 @@
 <?php
-
 use Peridot\Core\Context;
 
 describe('Context', function() {
@@ -11,7 +10,7 @@ describe('Context', function() {
         $construct->setAccessible(true);
         $construct->invoke($context);
         $this->context = $context;
-        $this->context->setEventEmitter(new \Evenement\EventEmitter());
+        $this->context->setEventEmitter(new \Peridot\EventEmitter());
     });
 
     describe('->addSuite()', function() {

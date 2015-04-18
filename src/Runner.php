@@ -51,7 +51,7 @@ class Runner implements RunnerInterface
         $this->suite->setEventEmitter($this->eventEmitter);
         $start = microtime(true);
         $this->suite->run($result);
-        $this->eventEmitter->emit('runner.end', [microtime(true) - $start]);
+        $this->eventEmitter->emit('runner.end', microtime(true) - $start);
 
         restore_error_handler();
     }
@@ -78,7 +78,7 @@ class Runner implements RunnerInterface
     protected function handleErrors()
     {
         set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-            $this->eventEmitter->emit('error', [$errno, $errstr, $errfile, $errline]);
+            $this->eventEmitter->emit('error', $errno, $errstr, $errfile, $errline);
         });
     }
 }
