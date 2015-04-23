@@ -87,7 +87,7 @@ final class Context
      * @param $description
      * @param callable $fn
      */
-    public function addSuite($description, callable $fn, $pending = null)
+    public function addSuite($description, callable $fn = null, $pending = null)
     {
         $suite = $this->createSuite($description, $fn, $pending);
 
