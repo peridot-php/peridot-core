@@ -11,6 +11,13 @@ describe("Suite", function() {
        $this->eventEmitter = new EventEmitter();
     });
 
+    context("when constructed with null definition", function() {
+        it("it should default to a pending state", function() {
+            $suite = new Suite("should be pending");
+            assert($suite->getPending(), "suite should be pending if definition is null");
+        });
+    });
+
     describe('->run()', function() {
         it("should run multiple tests", function () {
             $suite = new Suite("Suite", function() {});

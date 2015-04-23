@@ -68,8 +68,15 @@ abstract class AbstractTest implements TestInterface
      * @param string   $description
      * @param callable $definition
      */
-    public function __construct($description, callable $definition)
+    public function __construct($description, callable $definition = null)
     {
+        if ($definition === null) {
+            $this->pending = true;
+            $definition = function () {
+                //noop
+            };
+        }
+
         $this->definition = $definition;
         $this->description = $description;
         $this->scope = new Scope();
