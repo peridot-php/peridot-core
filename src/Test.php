@@ -12,21 +12,6 @@ use Exception;
 class Test extends AbstractTest
 {
     /**
-     * @param string $description
-     * @param callable $definition
-     */
-    public function __construct($description, callable $definition = null)
-    {
-        if ($definition === null) {
-            $this->pending = true;
-            $definition = function () {
-                //noop
-            };
-        }
-        parent::__construct($description, $definition);
-    }
-
-    /**
      * Execute the test along with any setup and tear down functions.
      *
      * @param  TestResult $result
