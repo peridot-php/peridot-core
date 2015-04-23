@@ -160,7 +160,7 @@ final class Context
      * @param $pending
      * @return Suite
      */
-    private function createSuite($description, callable $fn, $pending)
+    private function createSuite($description, callable $fn = null, $pending = null)
     {
         $suite = new Suite($description, $fn);
         if ($pending !== null) {
