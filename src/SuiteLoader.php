@@ -57,7 +57,7 @@ class SuiteLoader implements SuiteLoaderInterface
         if (! file_exists($path)) {
             throw new \RuntimeException("Cannot load path $path");
         }
-        $pattern = realpath($path) . '/' . $this->pattern;
+        $pattern = realpath($path) . DIRECTORY_SEPARATOR . $this->pattern;
 
         return $this->globRecursive($pattern);
     }
@@ -94,8 +94,8 @@ class SuiteLoader implements SuiteLoaderInterface
     {
         $files = glob($pattern, $flags);
 
-        foreach (glob(dirname($pattern).'/*', GLOB_ONLYDIR|GLOB_NOSORT) as $dir) {
-            $files = array_merge($files, $this->globRecursive($dir .'/'. basename($pattern), $flags));
+        foreach (glob(dirname($pattern). DIRECTORY_SEPARATOR . '*', GLOB_ONLYDIR|GLOB_NOSORT) as $dir) {
+            $files = array_merge($files, $this->globRecursive($dir . DIRECTORY_SEPARATOR . basename($pattern), $flags));
         }
 
         return $files;
