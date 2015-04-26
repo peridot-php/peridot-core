@@ -2,8 +2,6 @@
 
 namespace Peridot\Core;
 
-use Peridot\Scope\Scope;
-
 /**
  * Base class for Peridot Suites and Tests
  *
