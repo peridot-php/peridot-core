@@ -1,7 +1,6 @@
 <?php
 namespace Peridot\Core;
 
-use Peridot\Scope\Scope;
 use Peridot\EventEmitterInterface;
 
 /**
