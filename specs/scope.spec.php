@@ -24,6 +24,38 @@ describe('Scope', function() {
             $this->scope->peridotAddChildScope($test);
             assert($test->peridotGetParentScope() === $this->scope, "should have set parent scope");
         });
+
+        it('can supply a key for the child scope', function () {
+            $test = new TestScope();
+            $this->scope->peridotAddChildScope($test, 'test');
+            $scope = $this->scope->peridotGetChildScope('test');
+            assert($scope === $test);
+        });
+    });
+
+    describe('->peridotHasChildScope()', function () {
+        it('returns true if a child scope with the given key exists', function () {
+            $test = new TestScope();
+            $this->scope->peridotAddChildScope($test, 'test');
+            assert($this->scope->peridotHasChildScope('test'));
+        });
+
+        it('returns false if a child scope with the given key does not exist', function () {
+            assert($this->scope->peridotHasChildScope('test') === false);
+        });
+    });
+
+    describe('->peridotRemoveChildScope()', function () {
+        it('returns true if it removes a child scope successfully', function () {
+            $test = new TestScope();
+            $this->scope->peridotAddChildScope($test, 'test');
+            $removed = $this->scope->peridotRemoveChildScope('test');
+            assert($removed);
+        });
+
+        it('returns false if it did not remove a scope', function () {
+            assert($this->scope->peridotRemoveChildScope('test') === false);
+        });
     });
 
     describe('->peridotBindTo()', function() {
@@ -67,7 +99,7 @@ describe('Scope', function() {
                 assert($evenNumber === 4, "expected scope to look up child scope's child method");
             });
 
-            context("when mixing in multiple scopes, one of which has a child", function() {
+            context("and multiple scopes have been mixed in, one of which has a child", function() {
                 it ("should look up the child scope on the sibling", function() {
                     $testScope = new TestScope();
                     $testSibling = new TestSiblingScope();
