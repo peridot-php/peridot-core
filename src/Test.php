@@ -2,6 +2,7 @@
 
 namespace Peridot\Core;
 
+use Peridot\Core\Exception\PendingException;
 use Exception;
 
 /**
@@ -25,6 +26,7 @@ class Test extends AbstractTest
             $result->pendTest($this);
             return;
         }
+        
         $this->executeTest($result);
         $result->endTest($this);
     }
@@ -40,6 +42,8 @@ class Test extends AbstractTest
         try {
             $this->runSetup();
             call_user_func_array($this->getDefinition(), $this->getDefinitionArguments());
+        } catch (PendingException $e) {
+            $action = ['pendTest', $this];
         } catch (Exception $e) {
             $action = ['failTest', $this, $e];
         }
