@@ -14,9 +14,9 @@ use DomainException;
 class Scope
 {
     /**
-     * @var \SplObjectStorage
+     * @var array
      */
-    protected $peridotChildScopes;
+    protected $peridotChildScopes = [];
 
     /**
      * @var Scope
@@ -25,11 +25,15 @@ class Scope
 
     /**
      * @param Scope $scope
+     * @param string $key - an optional key. defaults to the scope's object hash
      */
-    public function peridotAddChildScope(Scope $scope)
+    public function peridotAddChildScope(Scope $scope, $key = "")
     {
         $scope->peridotSetParentScope($this);
-        $this->peridotGetChildScopes()->attach($scope);
+        if (empty($key)) {
+            $key = spl_object_hash($scope);
+        }
+        $this->peridotChildScopes[$key] = $scope;
     }
 
     /**
@@ -50,14 +54,53 @@ class Scope
     }
 
     /**
-     * @return \SplObjectStorage
+     * @return array
      */
     public function peridotGetChildScopes()
     {
-        if (!isset($this->peridotChildScopes)) {
-            $this->peridotChildScopes = new \SplObjectStorage();
-        }
         return $this->peridotChildScopes;
+    }
+
+    /**
+     * See if a child scope identified by key exists
+     *
+     * @param string $key
+     * @return bool
+     */
+    public function peridotHasChildScope($key)
+    {
+        if (isset($this->peridotChildScopes[$key])) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get a child scope by it's key
+     *
+     * @return Scope|null
+     */
+    public function peridotGetChildScope($key)
+    {
+        if ($this->peridotHasChildScope($key)) {
+            return $this->peridotChildScopes[$key];
+        }
+        return null;
+    }
+
+    /**
+     * Remove a child scope by it's key
+     *
+     * @param string $key
+     * @return bool
+     */
+    public function peridotRemoveChildScope($key)
+    {
+        if ($this->peridotHasChildScope($key)) {
+            unset($this->peridotChildScopes[$key]);
+            return true;
+        }
+        return false;
     }
 
     /**
