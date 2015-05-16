@@ -4,6 +4,7 @@ use Peridot\Core\Test;
 use Peridot\Core\TestResult;
 use Peridot\Core\Suite;
 use Peridot\Core\Scope;
+use Peridot\Core\Exception\PendingException;
 
 describe("Test", function() {
 
@@ -98,6 +99,15 @@ describe("Test", function() {
 
             $test->run(new TestResult(new EventEmitter()));
             assert(empty($test->getScope()->log), 'test should have been skipped');
+        });
+
+        it('should add a pending result if a PendingException is thrown', function () {
+            $test = new Test('should pend', function () {
+                throw new PendingException();
+            });
+            $result = new TestResult(new EventEmitter());
+            $test->run($result);
+            assert("1 run, 0 failed, 1 pending" == $result->getSummary());
         });
 
         context("when test is pending", function() {
