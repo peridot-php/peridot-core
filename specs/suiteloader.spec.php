@@ -5,9 +5,9 @@ use Peridot\Core\SuiteLoader;
 describe("SuiteLoader", function() {
 
     beforeEach(function() {
-        $this->loader = new SuiteLoader('*.spec.php');
-        $this->fixtures = __DIR__ . '/../fixtures';
         $this->context = Context::getInstance();
+        $this->loader = new SuiteLoader('*.spec.php', $this->context);
+        $this->fixtures = __DIR__ . '/../fixtures';
         $this->file = $this->context->getFile();
     });
 
@@ -51,14 +51,14 @@ describe("SuiteLoader", function() {
 
     describe('->load()', function() {
         it('should include files matching the pattern', function() {
-            $loader = new SuiteLoader('notaspec.php');
+            $loader = new SuiteLoader('notaspec.php', $this->context);
             $loader->load($this->fixtures);
             $exists = function_exists('notaspec');
             assert($exists, 'loader should have included file matching glob pattern');
         });
 
         it('should set the context file path', function() {
-            $loader = new SuiteLoader('test2.spec.php');
+            $loader = new SuiteLoader('test2.spec.php', $this->context);
             $loader->load($this->fixtures);
             $expected = realpath($this->fixtures . '/test2.spec.php');
             $actual = $this->context->getFile();
