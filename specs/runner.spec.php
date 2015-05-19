@@ -1,5 +1,6 @@
 <?php
 use Peridot\EventEmitter;
+use Peridot\Core\Context;
 use Peridot\Core\Test;
 use Peridot\Core\Suite;
 use Peridot\Core\Runner;
@@ -10,7 +11,8 @@ describe("Runner", function() {
 
     beforeEach(function() {
         $this->result = new TestResult(new EventEmitter());
-        $this->loader = new SuiteLoader('*.spec.php');
+        $this->context = Context::getInstance();
+        $this->loader = new SuiteLoader('*.spec.php', $this->context);
     });
 
     context("running a single suite", function() {
