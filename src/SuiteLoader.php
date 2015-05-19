@@ -21,11 +21,12 @@ class SuiteLoader implements SuiteLoaderInterface
 
     /**
      * @param string $pattern
+     * @param Context
      */
-    public function __construct($pattern)
+    public function __construct($pattern, Context $context)
     {
         $this->pattern = $pattern;
-        $this->context = Context::getInstance();
+        $this->context = $context;
     }
 
     /**
