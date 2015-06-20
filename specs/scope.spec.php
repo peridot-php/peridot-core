@@ -6,65 +6,65 @@ describe('Scope', function() {
         $this->scope = new Scope();
     });
 
-    describe('->peridotAddChildScope()', function() {
+    describe('->addChildScope()', function() {
         it('should mixin behavior via __call', function() {
-            $this->scope->peridotAddChildScope(new TestScope());
+            $this->scope->addChildScope(new TestScope());
             $number = $this->scope->getNumber();
             assert(5 === $number, 'getNumber() should return value');
         });
 
         it('should mixin properties via __get', function() {
-            $this->scope->peridotAddChildScope(new TestScope());
+            $this->scope->addChildScope(new TestScope());
             $name = $this->scope->name;
             assert($name == "brian", "property should return value");
         });
 
         it('should set the parent scope property on child', function() {
             $test = new TestScope();
-            $this->scope->peridotAddChildScope($test);
-            assert($test->peridotGetParentScope() === $this->scope, "should have set parent scope");
+            $this->scope->addChildScope($test);
+            assert($test->getParentScope() === $this->scope, "should have set parent scope");
         });
 
         it('can supply a key for the child scope', function () {
             $test = new TestScope();
-            $this->scope->peridotAddChildScope($test, 'test');
-            $scope = $this->scope->peridotGetChildScope('test');
+            $this->scope->addChildScope($test, 'test');
+            $scope = $this->scope->getChildScope('test');
             assert($scope === $test);
         });
     });
 
-    describe('->peridotHasChildScope()', function () {
+    describe('->hasChildScope()', function () {
         it('returns true if a child scope with the given key exists', function () {
             $test = new TestScope();
-            $this->scope->peridotAddChildScope($test, 'test');
-            assert($this->scope->peridotHasChildScope('test'));
+            $this->scope->addChildScope($test, 'test');
+            assert($this->scope->hasChildScope('test'));
         });
 
         it('returns false if a child scope with the given key does not exist', function () {
-            assert($this->scope->peridotHasChildScope('test') === false);
+            assert($this->scope->hasChildScope('test') === false);
         });
     });
 
-    describe('->peridotRemoveChildScope()', function () {
+    describe('->removeChildScope()', function () {
         it('returns true if it removes a child scope successfully', function () {
             $test = new TestScope();
-            $this->scope->peridotAddChildScope($test, 'test');
-            $removed = $this->scope->peridotRemoveChildScope('test');
+            $this->scope->addChildScope($test, 'test');
+            $removed = $this->scope->removeChildScope('test');
             assert($removed);
         });
 
         it('returns false if it did not remove a scope', function () {
-            assert($this->scope->peridotRemoveChildScope('test') === false);
+            assert($this->scope->removeChildScope('test') === false);
         });
     });
 
-    describe('->peridotBindTo()', function() {
+    describe('->bindTo()', function() {
         it('should bind a Closure to the scope', function() {
             $callable = function() {
                 return $this->name;
             };
             $scope = new TestScope();
-            $bound = $scope->peridotBindTo($callable);
+            $bound = $scope->bindTo($callable);
             $result = $bound();
             assert($result == "brian", "scope should have been bound to callable");
         });
@@ -73,7 +73,7 @@ describe('Scope', function() {
             $callable = 'strpos';
             $scope = new TestScope();
 
-            $bound = $scope->peridotBindTo($callable);
+            $bound = $scope->bindTo($callable);
 
             assert($bound === 'strpos');
         });
@@ -93,8 +93,8 @@ describe('Scope', function() {
         context("and the desired method is on a child scope's child", function() {
             it ("should look up method on the child scope's child", function() {
                 $testScope = new TestScope();
-                $testScope->peridotAddChildScope(new TestChildScope());
-                $this->scope->peridotAddChildScope($testScope);
+                $testScope->addChildScope(new TestChildScope());
+                $this->scope->addChildScope($testScope);
                 $evenNumber = $this->scope->getEvenNumber();
                 assert($evenNumber === 4, "expected scope to look up child scope's child method");
             });
@@ -104,9 +104,9 @@ describe('Scope', function() {
                     $testScope = new TestScope();
                     $testSibling = new TestSiblingScope();
                     $testChild = new TestChildScope();
-                    $testSibling->peridotAddChildScope($testChild);
-                    $this->scope->peridotAddChildScope($testScope);
-                    $this->scope->peridotAddChildScope($testSibling);
+                    $testSibling->addChildScope($testChild);
+                    $this->scope->addChildScope($testScope);
+                    $this->scope->addChildScope($testSibling);
 
                     $number = $this->scope->getNumber();
                     $evenNumber = $this->scope->getEvenNumber();
@@ -121,8 +121,8 @@ describe('Scope', function() {
 
         context("when mixing in multiple scopes", function() {
             it ("should look up methods for sibling scopes", function() {
-                $this->scope->peridotAddChildScope(new TestScope());
-                $this->scope->peridotAddChildScope(new TestChildScope());
+                $this->scope->addChildScope(new TestScope());
+                $this->scope->addChildScope(new TestChildScope());
                 $evenNumber = $this->scope->getEvenNumber();
                 $number = $this->scope->getNumber();
                 assert($evenNumber === 4, "expected scope to look up child method getEvenNumber()");
@@ -145,8 +145,8 @@ describe('Scope', function() {
         context("and the desired property is on a child scope's child", function() {
             it ("should look up property on the child scope's child", function() {
                 $testScope = new TestScope();
-                $testScope->peridotAddChildScope(new TestChildScope());
-                $this->scope->peridotAddChildScope($testScope);
+                $testScope->addChildScope(new TestChildScope());
+                $this->scope->addChildScope($testScope);
                 $surname = $this->scope->surname;
                 assert($surname === "scaturro", "expected scope to look up child scope's child property");
             });
@@ -156,9 +156,9 @@ describe('Scope', function() {
                     $testScope = new TestScope();
                     $testSibling = new TestSiblingScope();
                     $testChild = new TestChildScope();
-                    $testSibling->peridotAddChildScope($testChild);
-                    $this->scope->peridotAddChildScope($testScope);
-                    $this->scope->peridotAddChildScope($testSibling);
+                    $testSibling->addChildScope($testChild);
+                    $this->scope->addChildScope($testScope);
+                    $this->scope->addChildScope($testSibling);
 
                     $name = $this->scope->name;
                     $middle = $this->scope->middleName;
@@ -173,8 +173,8 @@ describe('Scope', function() {
 
         context("when mixing in multiple scopes", function() {
             it ("should look up properties for sibling scopes", function() {
-                $this->scope->peridotAddChildScope(new TestScope());
-                $this->scope->peridotAddChildScope(new TestChildScope());
+                $this->scope->addChildScope(new TestScope());
+                $this->scope->addChildScope(new TestChildScope());
                 $name = $this->scope->name;
                 $surname = $this->scope->surname;
                 assert($name === "brian", "expected result of TestScope::name");

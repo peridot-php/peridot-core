@@ -27,9 +27,9 @@ class Scope
      * @param Scope $scope
      * @param string $key - an optional key. defaults to the scope's object hash
      */
-    public function peridotAddChildScope(Scope $scope, $key = "")
+    public function addChildScope(Scope $scope, $key = "")
     {
-        $scope->peridotSetParentScope($this);
+        $scope->setParentScope($this);
         if (empty($key)) {
             $key = spl_object_hash($scope);
         }
@@ -39,7 +39,7 @@ class Scope
     /**
      * @return Scope
      */
-    public function peridotGetParentScope()
+    public function getParentScope()
     {
         return $this->peridotParentScope;
     }
@@ -47,7 +47,7 @@ class Scope
     /**
      * @param Scope $peridotParentScope
      */
-    public function peridotSetParentScope($peridotParentScope)
+    public function setParentScope($peridotParentScope)
     {
         $this->peridotParentScope = $peridotParentScope;
         return $this;
@@ -56,7 +56,7 @@ class Scope
     /**
      * @return array
      */
-    public function peridotGetChildScopes()
+    public function getChildScopes()
     {
         return $this->peridotChildScopes;
     }
@@ -67,7 +67,7 @@ class Scope
      * @param string $key
      * @return bool
      */
-    public function peridotHasChildScope($key)
+    public function hasChildScope($key)
     {
         if (isset($this->peridotChildScopes[$key])) {
             return true;
@@ -80,9 +80,9 @@ class Scope
      *
      * @return Scope|null
      */
-    public function peridotGetChildScope($key)
+    public function getChildScope($key)
     {
-        if ($this->peridotHasChildScope($key)) {
+        if ($this->hasChildScope($key)) {
             return $this->peridotChildScopes[$key];
         }
         return null;
@@ -94,9 +94,9 @@ class Scope
      * @param string $key
      * @return bool
      */
-    public function peridotRemoveChildScope($key)
+    public function removeChildScope($key)
     {
-        if ($this->peridotHasChildScope($key)) {
+        if ($this->hasChildScope($key)) {
             unset($this->peridotChildScopes[$key]);
             return true;
         }
@@ -109,7 +109,7 @@ class Scope
      * @param callable $callable
      * @return callable
      */
-    public function peridotBindTo(callable $callable)
+    public function bindTo(callable $callable)
     {
         if ($callable instanceof Closure) {
             return Closure::bind($callable, $this, $this);
@@ -125,7 +125,7 @@ class Scope
      */
     public function __call($name, $arguments)
     {
-        list($result, $found) = $this->peridotScanChildren($this, function ($childScope, &$accumulator) use ($name, $arguments) {
+        list($result, $found) = $this->scanChildren($this, function ($childScope, &$accumulator) use ($name, $arguments) {
             if (method_exists($childScope, $name)) {
                 $accumulator = [call_user_func_array([$childScope, $name], $arguments), true];
             }
@@ -145,7 +145,7 @@ class Scope
      */
     public function &__get($name)
     {
-        list($result, $found) = $this->peridotScanChildren($this, function ($childScope, &$accumulator) use ($name) {
+        list($result, $found) = $this->scanChildren($this, function ($childScope, &$accumulator) use ($name) {
             if (property_exists($childScope, $name)) {
                 $accumulator = [$childScope->$name, true, $childScope];
             }
@@ -165,16 +165,16 @@ class Scope
      * @param array $accumulator
      * @return array
      */
-    protected function peridotScanChildren(Scope $scope, callable $fn, &$accumulator = [])
+    protected function scanChildren(Scope $scope, callable $fn, &$accumulator = [])
     {
         if (! empty($accumulator)) {
             return $accumulator;
         }
 
-        $children = $scope->peridotGetChildScopes();
+        $children = $scope->getChildScopes();
         foreach ($children as $childScope) {
             $fn($childScope, $accumulator);
-            $this->peridotScanChildren($childScope, $fn, $accumulator);
+            $this->scanChildren($childScope, $fn, $accumulator);
         }
         return $accumulator;
     }
