@@ -79,6 +79,29 @@ describe('Scope', function() {
         });
     });
 
+    describe('->inheritScope()', function () {
+        it('should copy properties from another scope', function () {
+            $src = new Scope();
+            $src->name = 'brian';
+            $target = new Scope();
+
+            $target->inheritScope($src);
+
+            assert($target->name === 'brian');
+        });
+
+        it('should not copy properties from another scope if they are already set', function () {
+            $src = new Scope();
+            $src->name = 'brian';
+            $target = new Scope();
+            $target->name = 'phil';
+
+            $target->inheritScope($src);
+
+            assert($target->name === 'phil');
+        });
+    });
+
     context("when calling a mixed in method", function() {
         it('should throw an exception when method not found', function() {
             $exception = null;
@@ -140,6 +163,18 @@ describe('Scope', function() {
                 $exception = $e;
             }
             assert(!is_null($exception), 'exception should not be null');
+        });
+
+        context('and the desired property is on a parent scope', function () {
+            it('should look up the property on the scope parent', function () {
+                $parent = new Scope();
+                $child = new Scope();
+                $parent->parentProperty = 'value';
+
+                $parent->addChildScope($child);
+
+                assert($child->parentProperty === 'value', 'expected child to be able to look at parent scope');
+            });
         });
 
         context("and the desired property is on a child scope's child", function() {

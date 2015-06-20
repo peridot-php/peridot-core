@@ -47,9 +47,10 @@ class Scope
     /**
      * @param Scope $peridotParentScope
      */
-    public function setParentScope($peridotParentScope)
+    public function setParentScope(Scope $peridotParentScope)
     {
         $this->peridotParentScope = $peridotParentScope;
+        $this->inheritScope($peridotParentScope);
         return $this;
     }
 
@@ -154,6 +155,23 @@ class Scope
             throw new DomainException("Scope property $name not found");
         }
         return $result;
+    }
+
+    /**
+     * Copy properties from another scope
+     *
+     * @param Scope $scope
+     * @return void
+     */
+    public function inheritScope(Scope $scope)
+    {
+        $properties = get_object_vars($scope);
+
+        foreach ($properties as $property => $value) {
+            if (!isset($this->$property)) {
+                $this->$property = $value;
+            }
+        }
     }
 
     /**
