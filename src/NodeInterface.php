@@ -30,4 +30,9 @@ interface NodeInterface
      * @return mixed
      */
     public function setParent(TestInterface $parent);
+
+    /**
+     * @return NodeInterface[]
+     */
+    public function getChildNodes();
 }

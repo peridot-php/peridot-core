@@ -34,6 +34,14 @@ class Suite extends AbstractTest
     }
 
     /**
+     * @return NodeInterface[]
+     */
+    public function getChildNodes()
+    {
+        return $this->tests;
+    }
+
+    /**
      * Return collection of tests
      *
      * @return array

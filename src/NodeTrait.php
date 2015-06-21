@@ -10,11 +10,24 @@ namespace Peridot\Core;
 trait NodeTrait
 {
     /**
+     * @var array
+     */
+    protected $childNodes = [];
+
+    /**
      * @return NodeInterface
      */
     public function getNode()
     {
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getChildNodes()
+    {
+        return $this->childNodes;
     }
 
     /**
