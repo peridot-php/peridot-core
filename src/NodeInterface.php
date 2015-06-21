@@ -2,6 +2,11 @@
 
 namespace Peridot\Core;
 
+/**
+ * NodeInterface provides methods for setting node relationships and tree traversal
+ *
+ * @package Peridot\Core
+ */
 interface NodeInterface
 {
     /**
@@ -21,18 +26,44 @@ interface NodeInterface
     public function walkDown(callable $fn);
 
     /**
-     * @return TestInterface
+     * Get the parent node
+     *
+     * @return NodeInterface
      */
     public function getParent();
 
     /**
+     * Set the parent node
+     *
      * @param  TestInterface $parent
      * @return mixed
      */
-    public function setParent(TestInterface $parent);
+    public function setParent(NodeInterface $parent);
 
     /**
+     * Get all child nodes
+     *
      * @return NodeInterface[]
      */
     public function getChildNodes();
+
+    /**
+     * Set child nodes
+     *
+     * @param array $nodes
+     */
+    public function setChildNodes(array $nodes);
+
+    /**
+     * @param NodeInterface $node
+     */
+    public function addChildNode(NodeInterface $node);
+
+    /**
+     * Remove the given child node and return it
+     *
+     * @param NodeInterface $node
+     * @return NodeInterface|null
+     */
+    public function removeNode(NodeInterface $node);
 }

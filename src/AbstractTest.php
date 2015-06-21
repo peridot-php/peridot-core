@@ -126,10 +126,12 @@ abstract class AbstractTest implements TestInterface
      * @param  TestInterface $parent
      * @return mixed|void
      */
-    public function setParent(TestInterface $parent)
+    public function setParent(NodeInterface $parent)
     {
         $this->setParentNode($parent);
-        $this->setScope($parent->getScope());
+        if ($parent instanceof TestInterface) {
+            $this->setScope($parent->getScope());
+        }
     }
 
     /**

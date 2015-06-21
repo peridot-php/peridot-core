@@ -28,11 +28,31 @@ trait NodeTrait
     }
 
     /**
+     * @param NodeInterface $node
+     */
+    public function addChildNode(NodeInterface $node)
+    {
+        $node->setParent($this->getNode());
+        $this->childNodes[] = $node;
+    }
+
+    /**
      * @return array
      */
     public function getChildNodes()
     {
         return $this->childNodes;
+    }
+
+    /**
+     * @param array $nodes
+     */
+    public function setChildNodes(array $nodes)
+    {
+        $this->childNodes = [];
+        foreach ($nodes as $node) {
+            $this->addChildNode($node);
+        }
     }
 
     /**
@@ -86,5 +106,30 @@ trait NodeTrait
         foreach ($nodes as $node) {
             $fn($node);
         }
+    }
+
+    /**
+     * Remove the given node from the tree
+     *
+     * @param NodeInterface $node
+     * @param NodeInterface|null
+     */
+    public function removeNode(NodeInterface $node)
+    {
+        $children = $this->getChildNodes();
+        $filtered = [];
+
+        foreach ($children as $child) {
+            if ($child !== $node) {
+                $filtered[] = $child;
+            }
+        }
+
+        if (count($filtered) !== count($children)) {
+            $this->setChildNodes($filtered);
+            return $node;
+        }
+
+        return null;
     }
 }

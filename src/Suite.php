@@ -9,13 +9,6 @@ namespace Peridot\Core;
 class Suite extends AbstractTest
 {
     /**
-     * Tests belonging to this suite
-     *
-     * @var array
-     */
-    protected $tests = [];
-
-    /**
      * Has the suite been halted
      *
      * @var bool
@@ -29,26 +22,17 @@ class Suite extends AbstractTest
      */
     public function addTest(TestInterface $test)
     {
-        $test->setParent($this);
-        $this->tests[] = $test;
-    }
-
-    /**
-     * @return NodeInterface[]
-     */
-    public function getChildNodes()
-    {
-        return $this->tests;
+        $this->addChildNode($test);
     }
 
     /**
      * Return collection of tests
      *
-     * @return array
+     * @return TestInterface[]
      */
     public function getTests()
     {
-        return $this->tests;
+        return $this->getChildNodes();
     }
 
     /**
@@ -58,7 +42,7 @@ class Suite extends AbstractTest
      */
     public function setTests(array $tests)
     {
-        $this->tests = $tests;
+        $this->setChildNodes($tests);
     }
 
     /**
@@ -82,7 +66,7 @@ class Suite extends AbstractTest
         $this->eventEmitter->emit('suite.start', $this);
         $this->eventEmitter->on('suite.halt', [$this, 'halt']);
 
-        foreach ($this->tests as $test) {
+        foreach ($this->childNodes as $test) {
 
             if ($this->halted) {
                 break;
