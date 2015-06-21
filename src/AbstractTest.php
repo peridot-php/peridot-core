@@ -10,7 +10,9 @@ namespace Peridot\Core;
 abstract class AbstractTest implements TestInterface
 {
     use HasEventEmitterTrait;
-    use NodeTrait;
+    use NodeTrait {
+        setParent as setParentNode;
+    }
 
     /**
      * The test definition as a callable.
@@ -37,11 +39,6 @@ abstract class AbstractTest implements TestInterface
      * @var string
      */
     protected $description;
-
-    /**
-     * @var TestInterface
-     */
-    protected $parent;
 
     /**
      * @var bool|null
@@ -131,18 +128,8 @@ abstract class AbstractTest implements TestInterface
      */
     public function setParent(TestInterface $parent)
     {
-        $this->parent = $parent;
+        $this->setParentNode($parent);
         $this->setScope($parent->getScope());
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return TestInterface
-     */
-    public function getParent()
-    {
-        return $this->parent;
     }
 
     /**

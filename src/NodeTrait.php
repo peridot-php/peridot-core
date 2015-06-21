@@ -15,6 +15,11 @@ trait NodeTrait
     protected $childNodes = [];
 
     /**
+     * @var NodeInterface
+     */
+    protected $parent;
+
+    /**
      * @return NodeInterface
      */
     public function getNode()
@@ -28,6 +33,27 @@ trait NodeTrait
     public function getChildNodes()
     {
         return $this->childNodes;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return NodeInterface
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param  NodeInterface $parent
+     * @return mixed|void
+     */
+    public function setParent(TestInterface $parent)
+    {
+        $this->parent = $parent;
     }
 
     /**
