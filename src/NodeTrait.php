@@ -10,7 +10,7 @@ namespace Peridot\Core;
 trait NodeTrait
 {
     /**
-     * @return TestInterface
+     * @return NodeInterface
      */
     public function getNode()
     {
