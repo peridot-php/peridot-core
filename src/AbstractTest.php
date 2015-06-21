@@ -87,7 +87,7 @@ abstract class AbstractTest implements TestInterface
      */
     public function addSetupFunction(callable $setupFn)
     {
-        $fn = $this->getScope()->peridotBindTo($setupFn);
+        $fn = $this->getScope()->bindTo($setupFn);
         array_push($this->setUpFns, $fn);
     }
 
@@ -98,7 +98,7 @@ abstract class AbstractTest implements TestInterface
      */
     public function addTearDownFunction(callable $tearDownFn)
     {
-        $fn = $this->getScope()->peridotBindTo($tearDownFn);
+        $fn = $this->getScope()->bindTo($tearDownFn);
         array_push($this->tearDownFns, $fn);
     }
 
@@ -119,7 +119,7 @@ abstract class AbstractTest implements TestInterface
      */
     public function getDefinition()
     {
-        return $this->scope->peridotBindTo($this->definition);
+        return $this->scope->bindTo($this->definition);
     }
 
     /**

@@ -44,6 +44,6 @@ class Listener
     {
         $scope = $test->getScope();
         $behavior = new StateBehavior($test);
-        $scope->peridotAddChildScope($behavior);
+        $scope->addChildScope($behavior);
     }
 }

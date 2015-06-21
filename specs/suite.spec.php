@@ -55,7 +55,7 @@ describe("Suite", function() {
 
         it('should pass child scopes to tests', function() {
             $suite = new Suite("Suite", function() {});
-            $suite->getScope()->peridotAddChildScope(new SuiteScope());
+            $suite->getScope()->addChildScope(new SuiteScope());
             $test = new Test("this is a test", function() {
                 assert($this->getNumber() == 5, "parent scope should be set on test");
             });
