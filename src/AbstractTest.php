@@ -10,6 +10,7 @@ namespace Peridot\Core;
 abstract class AbstractTest implements TestInterface
 {
     use HasEventEmitterTrait;
+    use NodeTrait;
 
     /**
      * The test definition as a callable.
@@ -199,38 +200,6 @@ abstract class AbstractTest implements TestInterface
     public function getTearDownFunctions()
     {
         return $this->tearDownFns;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param callable $fn
-     */
-    public function walkUp(callable $fn)
-    {
-        $node = $this;
-        while ($node !== null) {
-            $fn($node);
-            $node = $node->getParent();
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param callable $fn
-     */
-    public function walkDown(callable $fn)
-    {
-        $node = $this;
-        $nodes = [];
-        while ($node !== null) {
-            array_unshift($nodes, $node);
-            $node = $node->getParent();
-        }
-        foreach ($nodes as $node) {
-            $fn($node);
-        }
     }
 
     /**
