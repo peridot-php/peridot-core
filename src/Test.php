@@ -55,7 +55,7 @@ class Test extends AbstractTest
      */
     protected function runSetup()
     {
-        $this->forEachNodeTopDown(function (TestInterface $node) {
+        $this->walkDown(function (TestInterface $node) {
             $setups = $node->getSetupFunctions();
             foreach ($setups as $setup) {
                 call_user_func($setup);
@@ -72,7 +72,7 @@ class Test extends AbstractTest
      */
     protected function runTearDown(TestResult $result, $action)
     {
-        $this->forEachNodeBottomUp(function (TestInterface $test) use ($result, &$action) {
+        $this->walkUp(function (TestInterface $test) use ($result, &$action) {
             $tearDowns = $test->getTearDownFunctions();
             foreach ($tearDowns as $tearDown) {
                 try {

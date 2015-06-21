@@ -122,7 +122,7 @@ interface TestInterface
      *
      * @param callable $fn
      */
-    public function forEachNodeBottomUp(callable $fn);
+    public function walkUp(callable $fn);
 
     /**
      * Execute a callback for each node in this test, starting
@@ -130,7 +130,7 @@ interface TestInterface
      *
      * @param callable $fn
      */
-    public function forEachNodeTopDown(callable $fn);
+    public function walkDown(callable $fn);
 
     /**
      * Set arguments to be passed to the test definition when invoked.

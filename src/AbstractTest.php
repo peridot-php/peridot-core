@@ -206,7 +206,7 @@ abstract class AbstractTest implements TestInterface
      *
      * @param callable $fn
      */
-    public function forEachNodeBottomUp(callable $fn)
+    public function walkUp(callable $fn)
     {
         $node = $this;
         while ($node !== null) {
@@ -220,7 +220,7 @@ abstract class AbstractTest implements TestInterface
      *
      * @param callable $fn
      */
-    public function forEachNodeTopDown(callable $fn)
+    public function walkDown(callable $fn)
     {
         $node = $this;
         $nodes = [];
