@@ -109,6 +109,21 @@ trait NodeTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @param callable $fn
+     */
+    public function walk(callable $fn)
+    {
+        $children = $this->getNode()->getChildNodes();
+
+        foreach ($children as $child) {
+            $fn($child);
+            $child->walk($fn);
+        }
+    }
+
+    /**
      * Remove the given node from the tree
      *
      * @param NodeInterface $node
@@ -131,5 +146,22 @@ trait NodeTrait
         }
 
         return null;
+    }
+
+    /**
+     * Return a new structure with nodes matching
+     * the given predicate
+     *
+     * @param callable $predicate
+     * @return NodeInterface
+     */
+    public function filter(callable $predicate)
+    {
+        $this->walk(function (NodeInterface $node) use ($predicate) {
+            if (! $predicate($node)) {
+                $this->removeNode($node);
+            }
+        });
+        return $this;
     }
 }
