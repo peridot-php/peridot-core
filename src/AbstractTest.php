@@ -10,6 +10,9 @@ namespace Peridot\Core;
 abstract class AbstractTest implements TestInterface
 {
     use HasEventEmitterTrait;
+    use NodeTrait {
+        setParent as setParentNode;
+    }
 
     /**
      * The test definition as a callable.
@@ -36,11 +39,6 @@ abstract class AbstractTest implements TestInterface
      * @var string
      */
     protected $description;
-
-    /**
-     * @var TestInterface
-     */
-    protected $parent;
 
     /**
      * @var bool|null
@@ -128,20 +126,12 @@ abstract class AbstractTest implements TestInterface
      * @param  TestInterface $parent
      * @return mixed|void
      */
-    public function setParent(TestInterface $parent)
+    public function setParent(NodeInterface $parent)
     {
-        $this->parent = $parent;
-        $this->setScope($parent->getScope());
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return TestInterface
-     */
-    public function getParent()
-    {
-        return $this->parent;
+        $this->setParentNode($parent);
+        if ($parent instanceof TestInterface) {
+            $this->setScope($parent->getScope());
+        }
     }
 
     /**
@@ -199,38 +189,6 @@ abstract class AbstractTest implements TestInterface
     public function getTearDownFunctions()
     {
         return $this->tearDownFns;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param callable $fn
-     */
-    public function forEachNodeBottomUp(callable $fn)
-    {
-        $node = $this;
-        while ($node !== null) {
-            $fn($node);
-            $node = $node->getParent();
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param callable $fn
-     */
-    public function forEachNodeTopDown(callable $fn)
-    {
-        $node = $this;
-        $nodes = [];
-        while ($node !== null) {
-            array_unshift($nodes, $node);
-            $node = $node->getParent();
-        }
-        foreach ($nodes as $node) {
-            $fn($node);
-        }
     }
 
     /**

@@ -8,7 +8,7 @@ use Peridot\EventEmitterInterface;
  *
  * @package Peridot\Core
  */
-interface TestInterface
+interface TestInterface extends NodeInterface
 {
     /**
      * @param  TestResult $result
@@ -55,17 +55,6 @@ interface TestInterface
      * @return callable
      */
     public function getDefinition();
-
-    /**
-     * @return TestInterface
-     */
-    public function getParent();
-
-    /**
-     * @param  TestInterface $parent
-     * @return mixed
-     */
-    public function setParent(TestInterface $parent);
 
     /**
      * Returns the full description including parent descriptions
@@ -115,22 +104,6 @@ interface TestInterface
      * @return EventEmitterInterface
      */
     public function getEventEmitter();
-
-    /**
-     * Execute a callback for each node in this test, starting
-     * at the bottom of the tree.
-     *
-     * @param callable $fn
-     */
-    public function forEachNodeBottomUp(callable $fn);
-
-    /**
-     * Execute a callback for each node in this test, starting
-     * at the top of the tree.
-     *
-     * @param callable $fn
-     */
-    public function forEachNodeTopDown(callable $fn);
 
     /**
      * Set arguments to be passed to the test definition when invoked.
