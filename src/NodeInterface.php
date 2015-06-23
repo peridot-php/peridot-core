@@ -79,7 +79,8 @@ interface NodeInterface
      * the given predicate
      *
      * @param callable $predicate
+     * @param bool $invert
      * @return NodeInterface
      */
-    public function filter(callable $predicate);
+    public function filter(callable $predicate, $invert);
 }

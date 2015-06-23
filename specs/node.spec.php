@@ -58,20 +58,32 @@ describe('NodeInterface', function () {
     });
 
     describe('->filter()', function () {
-        it('should return a filtered node based on the given predicate', function () {
-            $fast = new Test('should run @fast');
-            $slow1 = new Test('should run @slow');
-            $slow2 = new Test('should also be @slow');
-            $this->node->setChildNodes([$fast, $slow1, $slow2]);
+        beforeEach(function () {
+            $this->fast = new Test('should run @fast');
+            $this->slow1 = new Test('should run @slow');
+            $this->slow2 = new Test('should also be @slow');
+            $this->node->setChildNodes([$this->fast, $this->slow1, $this->slow2]);
+        });
 
+        it('should return a filtered node based on the given predicate', function () {
             $filtered = $this->node->filter(function (TestInterface $test) {
                 return (bool) preg_match('/@slow/', $test->getDescription());
             });
             $children = $filtered->getChildNodes();
 
             assert(count($children) === 2, 'should have filtered out 1 child');
-            assert($children[0] === $slow1);
-            assert($children[1] === $slow2);
+            assert($children[0] === $this->slow1);
+            assert($children[1] === $this->slow2);
+        });
+
+        it('should allow inversion of the predicate condition', function () {
+            $filtered = $this->node->filter(function (TestInterface $test) {
+                return (bool) preg_match('/@slow/', $test->getDescription());
+            }, true);
+            $children = $filtered->getChildNodes();
+
+            assert(count($children) === 1, 'should have filtered out 2 children');
+            assert($children[0] === $this->fast);
         });
     });
 

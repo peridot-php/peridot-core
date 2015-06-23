@@ -153,12 +153,13 @@ trait NodeTrait
      * the given predicate
      *
      * @param callable $predicate
+     * @param bool $invert
      * @return NodeInterface
      */
-    public function filter(callable $predicate)
+    public function filter(callable $predicate, $invert = false)
     {
-        $this->walk(function (NodeInterface $node) use ($predicate) {
-            if (! $predicate($node)) {
+        $this->walk(function (NodeInterface $node) use ($predicate, $invert) {
+            if ($predicate($node) === $invert) {
                 $this->removeNode($node);
             }
         });
