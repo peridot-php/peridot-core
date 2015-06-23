@@ -1,4 +1,5 @@
 <?php
+use Peridot\Core\Scope;
 use Peridot\EventEmitter;
 use Peridot\Core\Context;
 use Peridot\Core\Test;
@@ -194,27 +195,42 @@ describe("Runner", function() {
         });
 
         context('when using a grep pattern', function () {
+            beforeEach(function () {
+                $this->scope = new Scope();
+                $this->scope->slowRan = false;
+                $this->scope->fastRan = false;
+                $this->suite = new Suite('parent', function () {});
+                $this->suite->setScope($this->scope);
+
+                $slow = new Test('child @slow', function () {
+                    $this->slowRan = true;
+                });
+                $fast = new Test('child @fast', function () {
+                    $this->fastRan = true;
+                });
+
+                $this->suite->addTest($slow);
+                $this->suite->addTest($fast);
+            });
+
             it('should only run tests with matching titles', function () {
-                $slowRan = null;
-                $fastRan = null;
-                $suite = new Suite('parent', function () {});
-
-                $slow = new Test('child @slow', function () use (&$slowRan) {
-                    $slowRan = true;
-                });
-                $fast = new Test('child @fast', function () use (&$fastRan) {
-                    $fastRan = true;
-                });
-
-                $suite->addTest($slow);
-                $suite->addTest($fast);
-                $runner = new Runner($suite, $this->eventEmitter);
+                $runner = new Runner($this->suite, $this->eventEmitter);
                 $runner->setGrepPattern('@slow');
 
                 $runner->run(new TestResult(new EventEmitter()));
 
-                assert($slowRan, 'slow test should have been run');
-                assert($fastRan === null, 'fast test should not have been run');
+                assert($this->scope->slowRan, 'slow test should not have been run');
+                assert($this->scope->fastRan === false, 'fast test should not have been run');
+            });
+
+            it('should allow inversion of the grep pattern', function () {
+                $runner = new Runner($this->suite, $this->eventEmitter);
+                $runner->setGrepPattern('@slow', true);
+
+                $runner->run(new TestResult(new EventEmitter()));
+
+                assert($this->scope->slowRan === false, 'slow test should have been run');
+                assert($this->scope->fastRan, 'fast test should have been run');
             });
         });
     });

@@ -36,7 +36,8 @@ interface RunnerInterface
      * matching the pattern will be included in the test run
      *
      * @param string $pattern
+     * @param bool $invert
      * @return void
      */
-    public function setGrepPattern($pattern);
+    public function setGrepPattern($pattern, $invert);
 }

@@ -28,6 +28,11 @@ class Runner implements RunnerInterface
     protected $grep = '';
 
     /**
+     * @var bool
+     */
+    protected $invert = false;
+
+    /**
      * @param Suite $suite
      * @param EventEmitterInterface $eventEmitter
      */
@@ -72,35 +77,10 @@ class Runner implements RunnerInterface
      * @param string $pattern
      * @return void
      */
-    public function setGrepPattern($pattern)
+    public function setGrepPattern($pattern, $invert = false)
     {
         $this->grep = '|' . preg_quote($pattern) . '|';
-    }
-
-    /**
-     * A listener for test failure
-     *
-     * @return void
-     */
-    public function onTestFailure()
-    {
-        if ($this->shouldStopOnFailure()) {
-            $this->eventEmitter->emit('suite.halt');
-        }
-    }
-
-    /**
-     * Filter nodes based on the set grep expression
-     *
-     * @param NodeInterface $node
-     * @return bool
-     */
-    public function filterNodes(NodeInterface $node)
-    {
-        if (!$node instanceof TestInterface) {
-            return true;
-        }
-        return (bool) preg_match($this->grep, $node->getTitle());
+        $this->invert = $invert;
     }
 
     /**
@@ -136,9 +116,35 @@ class Runner implements RunnerInterface
     {
         $suite = $this->suite;
         if (!empty($this->grep)) {
-            $suite = $suite->filter([$this, 'filterNodes']);
+            $suite = $suite->filter([$this, 'filterNodes'], $this->invert);
             return $suite;
         }
         return $suite;
+    }
+
+    /**
+     * A listener for test failure
+     *
+     * @return void
+     */
+    public function onTestFailure()
+    {
+        if ($this->shouldStopOnFailure()) {
+            $this->eventEmitter->emit('suite.halt');
+        }
+    }
+
+    /**
+     * Filter nodes based on the set grep expression
+     *
+     * @param NodeInterface $node
+     * @return bool
+     */
+    public function filterNodes(NodeInterface $node)
+    {
+        if (!$node instanceof TestInterface) {
+            return true;
+        }
+        return (bool) preg_match($this->grep, $node->getTitle());
     }
 }
