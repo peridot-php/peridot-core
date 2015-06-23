@@ -23,6 +23,11 @@ class Runner implements RunnerInterface
     protected $stopOnFailure;
 
     /**
+     * @var string
+     */
+    protected $grep = '';
+
+    /**
      * @param Suite $suite
      * @param EventEmitterInterface $eventEmitter
      */
@@ -40,19 +45,8 @@ class Runner implements RunnerInterface
     public function run(TestResult $result)
     {
         $this->handleErrors();
-
-        $this->eventEmitter->on('test.failed', function () {
-            if ($this->shouldStopOnFailure()) {
-                $this->eventEmitter->emit('suite.halt');
-            }
-        });
-
-        $this->eventEmitter->emit('runner.start');
-        $this->suite->setEventEmitter($this->eventEmitter);
-        $start = microtime(true);
-        $this->suite->run($result);
-        $this->eventEmitter->emit('runner.end', microtime(true) - $start);
-
+        $this->eventEmitter->on('test.failed', [$this, 'onTestFailure']);
+        $this->runSuite($result);
         restore_error_handler();
     }
 
@@ -73,6 +67,43 @@ class Runner implements RunnerInterface
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @param string $pattern
+     * @return void
+     */
+    public function setGrepPattern($pattern)
+    {
+        $this->grep = '|' . preg_quote($pattern) . '|';
+    }
+
+    /**
+     * A listener for test failure
+     *
+     * @return void
+     */
+    public function onTestFailure()
+    {
+        if ($this->shouldStopOnFailure()) {
+            $this->eventEmitter->emit('suite.halt');
+        }
+    }
+
+    /**
+     * Filter nodes based on the set grep expression
+     *
+     * @param NodeInterface $node
+     * @return bool
+     */
+    public function filterNodes(NodeInterface $node)
+    {
+        if (!$node instanceof TestInterface) {
+            return true;
+        }
+        return (bool) preg_match($this->grep, $node->getTitle());
+    }
+
+    /**
      * Set an error handler to broadcast an error event.
      */
     protected function handleErrors()
@@ -80,5 +111,34 @@ class Runner implements RunnerInterface
         set_error_handler(function ($errno, $errstr, $errfile, $errline) {
             $this->eventEmitter->emit('error', $errno, $errstr, $errfile, $errline);
         });
+    }
+
+    /**
+     * @param TestResult $result
+     */
+    protected function runSuite(TestResult $result)
+    {
+        $suite = $this->getSuite();
+        $this->eventEmitter->emit('runner.start');
+        $suite->setEventEmitter($this->eventEmitter);
+        $start = microtime(true);
+        $suite->run($result);
+        $this->eventEmitter->emit('runner.end', microtime(true) - $start);
+    }
+
+    /**
+     * Get the suite being run. If a grep pattern has been supplied, it will be
+     * used to filter the tests being run.
+     *
+     * @return Suite
+     */
+    protected function getSuite()
+    {
+        $suite = $this->suite;
+        if (!empty($this->grep)) {
+            $suite = $suite->filter([$this, 'filterNodes']);
+            return $suite;
+        }
+        return $suite;
     }
 }

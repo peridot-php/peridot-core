@@ -30,4 +30,13 @@ interface RunnerInterface
      * @return bool
      */
     public function shouldStopOnFailure();
+
+    /**
+     * Set a pattern used to grep test descriptions. Tests with titles
+     * matching the pattern will be included in the test run
+     *
+     * @param string $pattern
+     * @return void
+     */
+    public function setGrepPattern($pattern);
 }

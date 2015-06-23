@@ -192,5 +192,30 @@ describe("Runner", function() {
             $old = set_error_handler(function($n,$s,$f,$l) {});
             assert($handler === $old, "runner should have restored previous handler");
         });
+
+        context('when using a grep pattern', function () {
+            it('should only run tests with matching titles', function () {
+                $slowRan = null;
+                $fastRan = null;
+                $suite = new Suite('parent', function () {});
+
+                $slow = new Test('child @slow', function () use (&$slowRan) {
+                    $slowRan = true;
+                });
+                $fast = new Test('child @fast', function () use (&$fastRan) {
+                    $fastRan = true;
+                });
+
+                $suite->addTest($slow);
+                $suite->addTest($fast);
+                $runner = new Runner($suite, $this->eventEmitter);
+                $runner->setGrepPattern('@slow');
+
+                $runner->run(new TestResult(new EventEmitter()));
+
+                assert($slowRan, 'slow test should have been run');
+                assert($fastRan === null, 'fast test should not have been run');
+            });
+        });
     });
 });
