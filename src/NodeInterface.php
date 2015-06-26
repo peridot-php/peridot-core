@@ -10,20 +10,27 @@ namespace Peridot\Core;
 interface NodeInterface
 {
     /**
-     * Execute a callback for each child node, starting
-     * at the bottom of the tree.
+     * Execute a callback for each node until the current node is reached, starting
+     * at the current node
      *
      * @param callable $fn
      */
     public function walkUp(callable $fn);
 
     /**
-     * Execute a callback for each child node, starting
-     * at the top of the tree.
+     * Execute a callback for each parent node until the current node is reached, starting
+     * at the oldest ancestor of the current node
      *
      * @param callable $fn
      */
     public function walkDown(callable $fn);
+
+    /**
+     * Execute a callback for every descendant of the current node
+     *
+     * @param callable $fn
+     */
+    public function walk(callable $fn);
 
     /**
      * Get the parent node
@@ -66,4 +73,14 @@ interface NodeInterface
      * @return NodeInterface|null
      */
     public function removeNode(NodeInterface $node);
+
+    /**
+     * Return a new structure with nodes matching
+     * the given predicate
+     *
+     * @param callable $predicate
+     * @param bool $invert
+     * @return NodeInterface
+     */
+    public function filter(callable $predicate, $invert);
 }
