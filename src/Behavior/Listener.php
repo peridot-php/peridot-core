@@ -44,6 +44,6 @@ class Listener
     {
         $scope = $test->getScope();
         $behavior = new StateBehavior($test);
-        $scope->addChildScope($behavior);
+        $scope->use($behavior);
     }
 }

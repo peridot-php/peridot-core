@@ -9,12 +9,14 @@ use DomainException;
  * Property bag for scoping "instance variables" and mixing in
  * behavior and state
  *
+ * @method void use() use(Scope $scope, string $key = "") An alias for mixin
+ *
  * @package Peridot\Core
  */
 class Scope
 {
     /**
-     * @var array
+     * @var Scope[]
      */
     protected $peridotChildScopes = [];
 
@@ -24,15 +26,24 @@ class Scope
     protected $peridotParentScope;
 
     /**
+     * Mixin a scope to this scope. Scopes function in a similar fashion to PHP traits. Scopes
+     * can access parent state, and also leverage child scopes of their own
+     *
      * @param Scope $scope
      * @param string $key - an optional key. defaults to the scope's object hash
+     * @return void
      */
-    public function addChildScope(Scope $scope, $key = "")
+    public function mixin(Scope $scope, $key = "")
     {
-        $scope->setParentScope($this);
         if (empty($key)) {
-            $key = spl_object_hash($scope);
+            $key = get_class($scope);
         }
+
+        if (isset($this->peridotChildScopes[$key])) {
+            return;
+        }
+
+        $scope->setParentScope($this);
         $this->peridotChildScopes[$key] = $scope;
     }
 
@@ -50,7 +61,6 @@ class Scope
     public function setParentScope(Scope $peridotParentScope)
     {
         $this->peridotParentScope = $peridotParentScope;
-        $this->inheritScope($peridotParentScope);
         return $this;
     }
 
@@ -126,14 +136,29 @@ class Scope
      */
     public function __call($name, $arguments)
     {
+        if ($name === 'use') {
+            return call_user_func_array([$this, 'mixin'], $arguments);
+        }
+
+        $parent = $this->getParentScope();
+
+        while ($parent !== null) {
+            if (method_exists($parent, $name)) {
+                return call_user_func_array([$parent, $name], $arguments);
+            }
+            $parent = $parent->getParentScope();
+        }
+
         list($result, $found) = $this->scanChildren($this, function ($childScope, &$accumulator) use ($name, $arguments) {
             if (method_exists($childScope, $name)) {
                 $accumulator = [call_user_func_array([$childScope, $name], $arguments), true];
             }
         });
+
         if (!$found) {
             throw new BadMethodCallException("Scope method $name not found");
         }
+
         return $result;
     }
 
@@ -146,6 +171,15 @@ class Scope
      */
     public function &__get($name)
     {
+        $parent = $this->getParentScope();
+
+        while ($parent !== null) {
+            if (property_exists($parent, $name)) {
+                return $parent->$name;
+            }
+            $parent = $parent->getParentScope();
+        }
+
         list($result, $found) = $this->scanChildren($this, function ($childScope, &$accumulator) use ($name) {
             if (property_exists($childScope, $name)) {
                 $accumulator = [$childScope->$name, true, $childScope];
@@ -157,22 +191,6 @@ class Scope
         return $result;
     }
 
-    /**
-     * Copy properties from another scope
-     *
-     * @param Scope $scope
-     * @return void
-     */
-    public function inheritScope(Scope $scope)
-    {
-        $properties = get_object_vars($scope);
-
-        foreach ($properties as $property => $value) {
-            if (!isset($this->$property)) {
-                $this->$property = $value;
-            }
-        }
-    }
 
     /**
      * Scan child scopes and execute a function against each one passing an

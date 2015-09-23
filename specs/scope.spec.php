@@ -6,37 +6,58 @@ describe('Scope', function() {
         $this->scope = new Scope();
     });
 
-    describe('->addChildScope()', function() {
-        it('should mixin behavior via __call', function() {
-            $this->scope->addChildScope(new TestScope());
+    describe('->mixin()', function () {
+        it('should mixin behavior via __call', function () {
+            $this->scope->mixin(new TestScope());
             $number = $this->scope->getNumber();
             assert(5 === $number, 'getNumber() should return value');
         });
 
         it('should mixin properties via __get', function() {
-            $this->scope->addChildScope(new TestScope());
+            $this->scope->mixin(new TestScope());
             $name = $this->scope->name;
             assert($name == "brian", "property should return value");
         });
 
         it('should set the parent scope property on child', function() {
             $test = new TestScope();
-            $this->scope->addChildScope($test);
+            $this->scope->mixin($test);
             assert($test->getParentScope() === $this->scope, "should have set parent scope");
         });
 
         it('can supply a key for the child scope', function () {
             $test = new TestScope();
-            $this->scope->addChildScope($test, 'test');
+            $this->scope->mixin($test, 'test');
             $scope = $this->scope->getChildScope('test');
             assert($scope === $test);
+        });
+
+        it('should default the key to the object\'s type', function () {
+            $this->scope->mixin(new TestScope());
+
+            assert($this->scope->hasChildScope('TestScope'), 'should use scopes type as key by default');
+        });
+
+        it('should not override scopes of the same key', function () {
+            $test = new TestScope();
+            $this->scope->mixin($test);
+            $this->scope->mixin(new TestScope());
+
+            $child = $this->scope->getChildScope('TestScope');
+
+            assert($child === $test, 'should not override scopes of same key');
+        });
+
+        it('can be aliased as "use"', function () {
+            $this->scope->use(new TestScope());
+            assert($this->scope->hasChildScope('TestScope'), 'should have TestScope child');
         });
     });
 
     describe('->hasChildScope()', function () {
         it('returns true if a child scope with the given key exists', function () {
             $test = new TestScope();
-            $this->scope->addChildScope($test, 'test');
+            $this->scope->mixin($test, 'test');
             assert($this->scope->hasChildScope('test'));
         });
 
@@ -48,7 +69,7 @@ describe('Scope', function() {
     describe('->removeChildScope()', function () {
         it('returns true if it removes a child scope successfully', function () {
             $test = new TestScope();
-            $this->scope->addChildScope($test, 'test');
+            $this->scope->mixin($test, 'test');
             $removed = $this->scope->removeChildScope('test');
             assert($removed);
         });
@@ -79,29 +100,6 @@ describe('Scope', function() {
         });
     });
 
-    describe('->inheritScope()', function () {
-        it('should copy properties from another scope', function () {
-            $src = new Scope();
-            $src->name = 'brian';
-            $target = new Scope();
-
-            $target->inheritScope($src);
-
-            assert($target->name === 'brian');
-        });
-
-        it('should not copy properties from another scope if they are already set', function () {
-            $src = new Scope();
-            $src->name = 'brian';
-            $target = new Scope();
-            $target->name = 'phil';
-
-            $target->inheritScope($src);
-
-            assert($target->name === 'phil');
-        });
-    });
-
     context("when calling a mixed in method", function() {
         it('should throw an exception when method not found', function() {
             $exception = null;
@@ -113,11 +111,22 @@ describe('Scope', function() {
             assert(!is_null($exception), 'exception should not be null');
         });
 
+        context('and the desired method is on a parent scope', function () {
+            it('should look up the property on the scope parent', function () {
+                $parent = new TestScope();
+                $child = new Scope();
+
+                $parent->mixin($child);
+
+                assert($child->getNumber() === 5, 'expected child to be able to look at parent scope methods');
+            });
+        });
+
         context("and the desired method is on a child scope's child", function() {
             it ("should look up method on the child scope's child", function() {
                 $testScope = new TestScope();
-                $testScope->addChildScope(new TestChildScope());
-                $this->scope->addChildScope($testScope);
+                $testScope->mixin(new TestChildScope());
+                $this->scope->mixin($testScope);
                 $evenNumber = $this->scope->getEvenNumber();
                 assert($evenNumber === 4, "expected scope to look up child scope's child method");
             });
@@ -127,9 +136,9 @@ describe('Scope', function() {
                     $testScope = new TestScope();
                     $testSibling = new TestSiblingScope();
                     $testChild = new TestChildScope();
-                    $testSibling->addChildScope($testChild);
-                    $this->scope->addChildScope($testScope);
-                    $this->scope->addChildScope($testSibling);
+                    $testSibling->mixin($testChild);
+                    $this->scope->mixin($testScope);
+                    $this->scope->mixin($testSibling);
 
                     $number = $this->scope->getNumber();
                     $evenNumber = $this->scope->getEvenNumber();
@@ -144,8 +153,8 @@ describe('Scope', function() {
 
         context("when mixing in multiple scopes", function() {
             it ("should look up methods for sibling scopes", function() {
-                $this->scope->addChildScope(new TestScope());
-                $this->scope->addChildScope(new TestChildScope());
+                $this->scope->mixin(new TestScope());
+                $this->scope->mixin(new TestChildScope());
                 $evenNumber = $this->scope->getEvenNumber();
                 $number = $this->scope->getNumber();
                 assert($evenNumber === 4, "expected scope to look up child method getEvenNumber()");
@@ -171,7 +180,7 @@ describe('Scope', function() {
                 $child = new Scope();
                 $parent->parentProperty = 'value';
 
-                $parent->addChildScope($child);
+                $parent->mixin($child);
 
                 assert($child->parentProperty === 'value', 'expected child to be able to look at parent scope');
             });
@@ -180,8 +189,8 @@ describe('Scope', function() {
         context("and the desired property is on a child scope's child", function() {
             it ("should look up property on the child scope's child", function() {
                 $testScope = new TestScope();
-                $testScope->addChildScope(new TestChildScope());
-                $this->scope->addChildScope($testScope);
+                $testScope->mixin(new TestChildScope());
+                $this->scope->mixin($testScope);
                 $surname = $this->scope->surname;
                 assert($surname === "scaturro", "expected scope to look up child scope's child property");
             });
@@ -191,9 +200,9 @@ describe('Scope', function() {
                     $testScope = new TestScope();
                     $testSibling = new TestSiblingScope();
                     $testChild = new TestChildScope();
-                    $testSibling->addChildScope($testChild);
-                    $this->scope->addChildScope($testScope);
-                    $this->scope->addChildScope($testSibling);
+                    $testSibling->mixin($testChild);
+                    $this->scope->mixin($testScope);
+                    $this->scope->mixin($testSibling);
 
                     $name = $this->scope->name;
                     $middle = $this->scope->middleName;
@@ -208,8 +217,8 @@ describe('Scope', function() {
 
         context("when mixing in multiple scopes", function() {
             it ("should look up properties for sibling scopes", function() {
-                $this->scope->addChildScope(new TestScope());
-                $this->scope->addChildScope(new TestChildScope());
+                $this->scope->mixin(new TestScope());
+                $this->scope->mixin(new TestChildScope());
                 $name = $this->scope->name;
                 $surname = $this->scope->surname;
                 assert($name === "brian", "expected result of TestScope::name");
