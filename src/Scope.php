@@ -4,17 +4,21 @@ namespace Peridot\Core;
 use BadMethodCallException;
 use Closure;
 use DomainException;
+use Peridot\Core\Scope\MethodResolver;
+use Peridot\Core\Scope\PropertyResolver;
 
 /**
  * Property bag for scoping "instance variables" and mixing in
  * behavior and state
+ *
+ * @method void use() use(Scope $scope, string $key = "") An alias for mixin
  *
  * @package Peridot\Core
  */
 class Scope
 {
     /**
-     * @var array
+     * @var Scope[]
      */
     protected $peridotChildScopes = [];
 
@@ -24,15 +28,24 @@ class Scope
     protected $peridotParentScope;
 
     /**
+     * Mixin a scope to this scope. Scopes function in a similar fashion to PHP traits. Scopes
+     * can access parent state, and also leverage child scopes of their own
+     *
      * @param Scope $scope
      * @param string $key - an optional key. defaults to the scope's object hash
+     * @return void
      */
-    public function addChildScope(Scope $scope, $key = "")
+    public function mixin(Scope $scope, $key = "")
     {
-        $scope->setParentScope($this);
         if (empty($key)) {
-            $key = spl_object_hash($scope);
+            $key = get_class($scope);
         }
+
+        if (isset($this->peridotChildScopes[$key])) {
+            return;
+        }
+
+        $scope->setParentScope($this);
         $this->peridotChildScopes[$key] = $scope;
     }
 
@@ -50,7 +63,6 @@ class Scope
     public function setParentScope(Scope $peridotParentScope)
     {
         $this->peridotParentScope = $peridotParentScope;
-        $this->inheritScope($peridotParentScope);
         return $this;
     }
 
@@ -126,15 +138,18 @@ class Scope
      */
     public function __call($name, $arguments)
     {
-        list($result, $found) = $this->scanChildren($this, function ($childScope, &$accumulator) use ($name, $arguments) {
-            if (method_exists($childScope, $name)) {
-                $accumulator = [call_user_func_array([$childScope, $name], $arguments), true];
-            }
-        });
-        if (!$found) {
+        if ($name === 'use') {
+            return call_user_func_array([$this, 'mixin'], $arguments);
+        }
+
+        $resolver = new MethodResolver($this);
+        $result = $resolver->resolve($name, $arguments);
+
+        if (! $result->found) {
             throw new BadMethodCallException("Scope method $name not found");
         }
-        return $result;
+
+        return $result->value;
     }
 
     /**
@@ -146,54 +161,13 @@ class Scope
      */
     public function &__get($name)
     {
-        list($result, $found) = $this->scanChildren($this, function ($childScope, &$accumulator) use ($name) {
-            if (property_exists($childScope, $name)) {
-                $accumulator = [$childScope->$name, true, $childScope];
-            }
-        });
-        if (!$found) {
+        $resolver = new PropertyResolver($this);
+        $result = $resolver->resolve($name);
+
+        if (! $result->found) {
             throw new DomainException("Scope property $name not found");
         }
-        return $result;
-    }
 
-    /**
-     * Copy properties from another scope
-     *
-     * @param Scope $scope
-     * @return void
-     */
-    public function inheritScope(Scope $scope)
-    {
-        $properties = get_object_vars($scope);
-
-        foreach ($properties as $property => $value) {
-            if (!isset($this->$property)) {
-                $this->$property = $value;
-            }
-        }
-    }
-
-    /**
-     * Scan child scopes and execute a function against each one passing an
-     * accumulator reference along.
-     *
-     * @param Scope $scope
-     * @param callable $fn
-     * @param array $accumulator
-     * @return array
-     */
-    protected function scanChildren(Scope $scope, callable $fn, &$accumulator = [])
-    {
-        if (! empty($accumulator)) {
-            return $accumulator;
-        }
-
-        $children = $scope->getChildScopes();
-        foreach ($children as $childScope) {
-            $fn($childScope, $accumulator);
-            $this->scanChildren($childScope, $fn, $accumulator);
-        }
-        return $accumulator;
+        return $result->value;
     }
 }
