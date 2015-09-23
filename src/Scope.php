@@ -4,6 +4,8 @@ namespace Peridot\Core;
 use BadMethodCallException;
 use Closure;
 use DomainException;
+use Peridot\Core\Scope\MethodResolver;
+use Peridot\Core\Scope\PropertyResolver;
 
 /**
  * Property bag for scoping "instance variables" and mixing in
@@ -140,26 +142,14 @@ class Scope
             return call_user_func_array([$this, 'mixin'], $arguments);
         }
 
-        $parent = $this->getParentScope();
+        $resolver = new MethodResolver($this);
+        $result = $resolver->resolve($name, $arguments);
 
-        while ($parent !== null) {
-            if (method_exists($parent, $name)) {
-                return call_user_func_array([$parent, $name], $arguments);
-            }
-            $parent = $parent->getParentScope();
-        }
-
-        list($result, $found) = $this->scanChildren($this, function ($childScope, &$accumulator) use ($name, $arguments) {
-            if (method_exists($childScope, $name)) {
-                $accumulator = [call_user_func_array([$childScope, $name], $arguments), true];
-            }
-        });
-
-        if (!$found) {
+        if (! $result->found) {
             throw new BadMethodCallException("Scope method $name not found");
         }
 
-        return $result;
+        return $result->value;
     }
 
     /**
@@ -171,47 +161,13 @@ class Scope
      */
     public function &__get($name)
     {
-        $parent = $this->getParentScope();
+        $resolver = new PropertyResolver($this);
+        $result = $resolver->resolve($name);
 
-        while ($parent !== null) {
-            if (property_exists($parent, $name)) {
-                return $parent->$name;
-            }
-            $parent = $parent->getParentScope();
-        }
-
-        list($result, $found) = $this->scanChildren($this, function ($childScope, &$accumulator) use ($name) {
-            if (property_exists($childScope, $name)) {
-                $accumulator = [$childScope->$name, true, $childScope];
-            }
-        });
-        if (!$found) {
+        if (! $result->found) {
             throw new DomainException("Scope property $name not found");
         }
-        return $result;
-    }
 
-
-    /**
-     * Scan child scopes and execute a function against each one passing an
-     * accumulator reference along.
-     *
-     * @param Scope $scope
-     * @param callable $fn
-     * @param array $accumulator
-     * @return array
-     */
-    protected function scanChildren(Scope $scope, callable $fn, &$accumulator = [])
-    {
-        if (! empty($accumulator)) {
-            return $accumulator;
-        }
-
-        $children = $scope->getChildScopes();
-        foreach ($children as $childScope) {
-            $fn($childScope, $accumulator);
-            $this->scanChildren($childScope, $fn, $accumulator);
-        }
-        return $accumulator;
+        return $result->value;
     }
 }
