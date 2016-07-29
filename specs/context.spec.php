@@ -1,5 +1,6 @@
 <?php
 use Peridot\Core\Context;
+use Peridot\EventEmitter;
 
 describe('Context', function() {
 
@@ -50,6 +51,22 @@ describe('Context', function() {
             $scope = $suite->getScope();
             assert($scope->value == "hello", "value should be bound to suites scope");
         });
+
+        it("should emit a 'suite.wasDefined' event containing the suite", function() {
+            $event_suite = null;
+            $event_fired = false;
+            $event_emitter = new EventEmitter();
+            $event_emitter->on('suite.wasDefined', function ($defined_suite) use (&$event_fired, &$event_suite) {
+                $event_fired = true;
+                $event_suite = $defined_suite;
+            });
+            $this->context->setEventEmitter($event_emitter);
+
+            $suite = $this->context->addSuite("desc", function() {});
+
+            assert($event_fired, "addSuite should emit 'suite.wasDefined' event");
+            assert($event_suite === $suite, "event emission should include the defined suite");
+        });
     });
 
     describe('->addTest()', function() {
@@ -72,6 +89,22 @@ describe('Context', function() {
             $this->context->addTest('spec', function () { });
             $suite = $this->context->getCurrentSuite();
             assert(sizeof($suite->getTests()) > 0, 'should have added test to root suite');
+        });
+
+        it("should emit a 'test.added' event containing the test", function() {
+            $event_test = null;
+            $event_fired = false;
+            $event_emitter = new EventEmitter();
+            $event_emitter->on('test.added', function ($added_test) use (&$event_fired, &$event_test) {
+                $event_fired = true;
+                $event_test = $added_test;
+            });
+            $this->context->setEventEmitter($event_emitter);
+
+            $the_added_test = $this->context->addTest('spec', function () { });
+
+            assert($event_fired, "addTest should emit 'test.added' event");
+            assert($event_test === $the_added_test, "event emission should include the added test");
         });
     });
 

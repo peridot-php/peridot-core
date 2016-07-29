@@ -94,6 +94,7 @@ final class Context
         $this->getCurrentSuite()->addTest($suite);
         array_unshift($this->suites, $suite);
         $suite->define();
+        $this->eventEmitter->emit('suite.wasDefined', $suite);
         array_shift($this->suites);
 
         return $suite;
@@ -113,6 +114,7 @@ final class Context
         }
         $test->setFile($this->file);
         $this->getCurrentSuite()->addTest($test);
+        $this->eventEmitter->emit('test.added', $test);
 
         return $test;
     }
